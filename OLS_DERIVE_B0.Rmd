@@ -1,0 +1,99 @@
+---
+title: "Deriving Ordinary Least Squares Estimators in Excruciating Detail (Part 1)"
+author: "Erik Case"
+date: "November 10, 2017"
+runtime: shiny
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Why OLS?
+
+Let's face it, finding the 'best' fit line via Ordinary Least Squares (OLS) just isn't sexy in today's world of more exotic methodological predictive techniques. Hell, the technique as we know it [is over 300 years old](http://www.stat.cmu.edu/~cshalizi/rmarkdown/rmarkdown.Rmd) Why devote my inagural post to it? 
+
+The first reason is that OLS has a special place in my heart (and with many modelers) as my entree into the world of data science and applied statistics. I would have sworn up and down that I really wasn't a 'math person' until I was rudely awakened by a course called Multivariate Regression Analyis. Despite now being a statistician/data scientist I'm still not even a 'math person,' in so much as that it comes to me not by ease of intuition, but by plodding, deliberate study.
+
+Second, and the reason why OLS turned me on to a career in statistics and was *able* to draw me in was it's pure elegance and intuitive accessability to the non-expert. When we see a scatterplot with a clear linear relationship we inutitively understand the nature of that relationship.
+
+Take for example this plot of Ferbie Sales (in 1000's) and Violent Crime in the United States
+
+```{r, echo=FALSE}
+library(dplyr)
+library(ggvis)
+
+Ferbie_Sales<-rnorm(100) + 10
+
+eps<-rnorm(100,0,3)
+
+Violent_Crime<-as.numeric(50 + 5*Ferbie_Sales + eps)
+
+require(reshape2)
+d <- cbind(Violent_Crime, Ferbie_Sales)
+
+d2<-as.data.frame(d)
+
+d2 %>%
+ ggvis(~Ferbie_Sales, ~ Violent_Crime, stroke:="blue") %>%
+  layer_points()
+```
+
+
+But that is not what this post is about. This post is about how we get these nifty parameter estimates for $\hat\beta_1$ and $\hat\beta_0$ Today, in deliciously painstaking detail, I will get you from here:
+
+
+  $\underset{\hat\beta_0 \hat\beta_1}{\text{min}}\sum_{i=1}^{n}{(y_i - \hat\beta_0 - \hat\beta_1x_i)^2}$
+
+To here :
+
+$\hat\beta_0$ = $\bar{y}$ - $\hat\beta_1 \bar{x}$
+
+#What is the immediate goal?
+
+
+More specifically, I have always been annoyed by guides on this problem thatskip
+
+As mentioned, if we solve the argument for $\hat\beta_0$  we can more easily turn around and get a pretty simple algebraic equation for $\hat\beta_1$, the estimated slope. This problem asks us to find the optimal values for $\hat\beta_0$ and $\hat\beta_1$ that *simultaneously* minimize the total squared deviations away (i.e. the 'residual sums of squares') from  $y_i$
+
+
+Note that in this expression we only have the power to change the values of $\hat\beta_0$ and $\hat\beta_1$ This means, in other words, that the values we pick for $\hat\beta_0$ and $\hat\beta_1$ must be optimal over *all* values of $x_i$ and $y_i$
+
+This begs the question - how will I know when I've chosen the best value of $\hat\beta_0$? Well, if a best solution exists, there should be a value of $\hat\beta_0$ that resides at a local minimum for the error E. With the right value for the Beta slope of the error is flat. This is the same thing as minimizing the residual sum of squares.
+
+
+If $\hat\beta_0$ and$\hat\beta_1$ are chosen correctly then any perturbation away from that choice will have an error slope of zero.
+
+Suppose that we've somehow settled on the following values for our parameters:
+
+$\hat\beta_0 = 2$
+
+$\hat\beta_1 = 3$
+
+And that the error from these choices is:
+
+$E(2,3) = 5$
+
+Then we nudge $\hat\beta_0$ a little bit and see what happens to the error:
+
+$\hat\beta_0 = 2.1$
+
+$\hat\beta_1 = 3$
+
+$E(2.1,3) = 5.1$
+
+Small increase. Ok. But then what if we nudge $\hat\beta_0$ *the other direction* and get the following:
+
+$\hat\beta_0 = 1.9$
+
+$\hat\beta_1 = 3$
+
+$E(1.9,3) = 4.9$
+
+Now this, this is a problem. It means that we have not reached a local minimum. In this made up scenario the error went down symetrically more or less and therefore are not on the lowest, flattest point of the error curve. What we are going for is a situation where the change is small (not symmetrical) to the input change.
+
+
+
