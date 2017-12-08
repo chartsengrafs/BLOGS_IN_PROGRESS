@@ -13,11 +13,27 @@ library(dplyr)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-##Revisiting a Classic
 ####  Deriving $\hat\beta_1$ - The Star of The Show
 
 
 
-Recall the explicit goal we had, which is minimizing $E$ ($E = {(y_i - \hat\beta_0 - \hat\beta_1x_i)^2}$ with respect to $\hat\beta_0$ and $\hat\beta_1$:
+Recall that we defined the error as such:
+
+$$E = {(y_i - \hat\beta_0 - \hat\beta_1x_i)^2}$$ 
+
+And that we wanted to minimize that error *with respect* to $\hat\beta_0$ and $\hat\beta_1$:
 
 $$\underset{\hat\beta_0 \hat\beta_1}{\text{min}}\displaystyle\sum_{i=1}^{n}{(y_i - \hat\beta_0 - \hat\beta_1x_i)^2}$$
+We follow the same first steps as before, this time taking the partial derivative of $E$ with respect to $\hat\beta_1$ and setting it to 0:
+$$\frac{\partial E}{\partial \hat\beta_1} = 0$$
+Put together, the equation looks like this 
+
+$$\frac{\partial E}{\partial \hat\beta_1}(-y_i + \hat\beta_0  +  \hat\beta_1x_i)^2=0$$
+
+Note that I also flipped the signs in the equation to make things easier in the future (pointing this out is what I mean by attention to mundane detail. I am taking nothing as 'obvious' to the reader). Because we are holding 'all else constant' in taking this partial derivative, $-y_i$ , $\hat\beta_0$ and $x_i$ are therefore *treated as* constants. The only thing we can vary is $\hat\beta_1$ . 
+
+Apply the chain rule to take the derivative and bring the exponent down:
+
+$$2(-y + \hat\beta_0  +  \hat\beta_1x_i)x_i$$
+But wait, where did that 'extra' $x_i$ come from? Because we are deriving $\hat\beta_1$ with respect to $E$, we have to know to also pull the derivative of the whole term ($x_i$) out.                                                                                                                                                                                                                                
+

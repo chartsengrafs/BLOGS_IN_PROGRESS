@@ -109,7 +109,7 @@ $\hat\beta_1 = 3$
 
 $E(1.9,3) = 4.9$
 
-Now  this symmetrical decrease is a problem. It means that we have not reached a local minimum. In this hypothetical scenario the error went down symetrically more or less and therefore the values of$\hat\beta_0$ and $\hat\beta_1$ are  not on the lowest, flattest point of the error curve. What we are going for is a situation where the change is small relative to the input change by *some order of magnitude*.
+Now, this symmetrical decrease is a problem. It means that we have not reached a local minimum. In this hypothetical scenario the error went down symetrically more or less and therefore the values of$\hat\beta_0$ and $\hat\beta_1$ are  not on the lowest, flattest point of the error curve. What we are going for is a situation where the change is small relative to the input change by *some order of magnitude*.
 
 Picture a marble running up and down the sides of a bowl. When you first let it go it swings up and down the sides of the bowl but eventually starts to settle. That is where you want  your error fluctations to be. That is where you have reached your local mimima. This is the point of minimized sum of squared residuals.
 
