@@ -1,0 +1,23 @@
+---
+title: "Deriving Ordinary Least Squares Estimators in Excruciating Detail (Part II)"
+author: "Erik Case"
+runtime: shiny
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library (reshape)
+library(knitr)
+library(ggvis)
+library(dplyr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Revisiting a Classic
+####  Deriving $\hat\beta_1$ - The Star of The Show
+
+
+
+Recall the explicit goal we had, which is minimizing $E$ ($E = {(y_i - \hat\beta_0 - \hat\beta_1x_i)^2}$ with respect to $\hat\beta_0$ and $\hat\beta_1$:
+
+$$\underset{\hat\beta_0 \hat\beta_1}{\text{min}}\displaystyle\sum_{i=1}^{n}{(y_i - \hat\beta_0 - \hat\beta_1x_i)^2}$$

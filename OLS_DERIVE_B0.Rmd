@@ -1,28 +1,33 @@
 ---
 title: "Deriving Ordinary Least Squares Estimators in Excruciating Detail (Part 1)"
 author: "Erik Case"
-date: "November 10, 2017"
 runtime: shiny
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library (reshape)
 library(knitr)
-
+library(ggvis)
+library(dplyr)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Why OLS?
+## Revisiting a Classic - Because Why?
 
-Let's face it, finding the 'best' fit line via Ordinary Least Squares (OLS) just isn't sexy in today's world of more exotic methodological predictive techniques. Hell, the technique as we know it [is over 300 years old](http://www.stat.cmu.edu/~cshalizi/rmarkdown/rmarkdown.Rmd) Why devote my inagural post to it? 
+Let's face it, finding the 'best' fit line via Ordinary Least Squares (OLS) just isn't sexy in today's world of more exotic methodological predictive techniques. Hell, the technique as we know it [is over 300 years old](http://www.stat.cmu.edu/~cshalizi/rmarkdown/rmarkdown.Rmd) Why devote my inagural post to something that is covered ad-nasueum in all baby Stats and even ML courses? 
 
-The first reason is that OLS has a special place in my heart (and with many modelers) as my entree into the world of data science and applied statistics. I would have sworn up and down that I really wasn't a 'math person' until I was rudely awakened by a course called Multivariate Regression Analyis. Despite now being a statistician/data scientist I'm still not even a 'math person,' in so much as that it comes to me not by ease of intuition, but by plodding, deliberate study. It was the elegant concept of OLS that got me into this world and I think, for at least my own edification, it is interesting to thoroughly review how thefoumular for univariate OLS is derived. So I called up my math tutor ALex Young for some pointers and wrote up
+My primary motivation for covering the derivation of $\hat\beta_0$ and $\hat\beta_1$ is to fill in some of the algebraic scaffolding left out of the online tutorials I have found found on this topic. Most people assume you are following every algebraic shortcut they make and I feel some people might benefit by seeing them derived in excruciating detail. I am also benefitting by reviewing the inner machinations of this clasdic technique.
 
-Second, and the reason why OLS turned me on to a career in statistics and was *able* to draw me in was it's pure elegance and intuitive accessability to the non-expert. When we see a scatterplot with a clear linear relationship we inutitively understand the nature of that relationship.
+The second reason is that OLS has a special place in my heart (and with many modelers) as my entree into the world of data science and applied statistics. I would have sworn up and down that I really wasn't a 'math person' until I was rudely awakened by a course called Multivariate Regression Analyis. Despite now being a data scientist I'm still not even a 'math person,' in so much as that it comes to me not by ease of intuition, but by plodding, deliberate study.  That
 
-Take for example this plot of Ferbie Sales (in 1000's) and Violent Crime in the United States
+But OLS  made me question my aelf assesment of ineptitude turned me on to a career in statistics because it was *able* to draw me in was it's pure elegance and intuitive accessability to the non-expert. When the concept of a best fit line through a stochastic process was explained to me, it immediately and conceptually *made sense* , leaving me thinking "This is kind of fun. What if I could do this for a living?"
 
-```{r,echo=FALSE}
+
+
+Take for example this totally made up and simulated plot of Ferbie Sales (in 1000's) and Violent Crime in the United States
+
+```{r,echo=FALSE, warning=FALSE}
 library(dplyr)
 library(ggvis)
 
@@ -53,7 +58,11 @@ d2 %>%
   layer_model_predictions(model = "lm", stroke := "orange", fill := "orange")
 ```
 
-How do we get that line, though, that that quantifies this relationship? OLS helps us pick the best line and determine the relationship by defining 'best' as a line that minimizes the average squared distance of the points in this stochastic process. However, note that the previous plot doesn't show us what origin (if any) to pass the line through ($\hat\beta_0$). This is the topic of today's formulation. The oft ignored and slightly maligned estimate for $\hat\beta_0$ does actually yield some interesting information, which is what would our dependent variable be if our explanatory variable was set to 0? In other words, what kind of utopia would we live in where Ferbie sales were noexistent and violent crime is but a memory? *Imagine*
+How do we get that line, though, that that quantifies this relationship? OLS helps us pick the best line and determine the relationship by defining 'best' as a line that minimizes the average squared distance of the points in this stochastic process. However, note that the previous plot doesn't show us what origin (if any) to pass the line through ($\hat\beta_0$). 
+
+This is the topic of today's formulation. The oft ignored and slightly maligned estimate for $\hat\beta_0$ does actually yield some interesting information. When I thonk of $\hat\beta_0$ by itself this i
+
+It tells us, for example which is what would our dependent variable be if our explanatory variable was set to 0.  In other the above simulated dataset, it would answer the question: "what kind of utopia would we live in where Ferbie sales were noexistent and violent crime is but a memory?"" *Imagine*
 
 Let's first explictly define error ($E$) in the manner previously mentioned:
 
@@ -64,10 +73,9 @@ We want to find the line that minimizes $E$ and get from this problem
   $\underset{\hat\beta_0 \hat\beta_1}{\text{min}}\displaystyle\sum_{i=1}^{n}{(y_i - \hat\beta_0 - \hat\beta_1x_i)^2}$
 
 
-To this simple equation:
+To this simple classic equation:
 
 $\hat\beta_0$ = $\bar{y}$ - $\hat\beta_1 \bar{x}$
-
 
 Note that in this minimization problem we only have the power to change the values of $\hat\beta_0$ and $\hat\beta_1$ This means, in other words, that the values we pick for $\hat\beta_0$ and $\hat\beta_1$ must be optimal over *all* values of $x_i$ and $y_i$
 
@@ -85,7 +93,7 @@ And that the error from these choices is:
 
 $E(2,3) = 5$
 
-Then we nudge $\hat\beta_0$ a little bit and see what happens to the error:
+Then, we nudge $\hat\beta_0$ a little bit and see what happens to the error:
 
 $\hat\beta_0 = 2.1$
 
@@ -101,7 +109,7 @@ $\hat\beta_1 = 3$
 
 $E(1.9,3) = 4.9$
 
-Now this, this symmetrical decrease is a problem. It means that we have not reached a local minimum. In this made up scenario the error went down symetrically more or less and therefore the values of$\hat\beta_0$ and $\hat\beta_1$ are  not on the lowest, flattest point of the error curve. What we are going for is a situation where the change is small relative to the input change by some order of magnitude.
+Now  this symmetrical decrease is a problem. It means that we have not reached a local minimum. In this hypothetical scenario the error went down symetrically more or less and therefore the values of$\hat\beta_0$ and $\hat\beta_1$ are  not on the lowest, flattest point of the error curve. What we are going for is a situation where the change is small relative to the input change by *some order of magnitude*.
 
 Picture a marble running up and down the sides of a bowl. When you first let it go it swings up and down the sides of the bowl but eventually starts to settle. That is where you want  your error fluctations to be. That is where you have reached your local mimima. This is the point of minimized sum of squared residuals.
 
@@ -167,4 +175,4 @@ $\bar y   -\hat\beta_1\ \bar x = \hat\beta_0$
 
 And there we have it, now we know where to put the $y$ intercept.
 
-Next post I will tackle the more difficult problem of using this newfound knowledge to derive the formula for $\hat\beta_1$
+In the next post, I will tackle the more difficult problem of using this newfound knowledge to derive the formula for $\hat\beta_1$
